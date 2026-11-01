@@ -698,6 +698,10 @@ public:
 
 	/// find existing command set
 	const CommandSet *findCommandSet( const AsciiString& name );
+#if RTS_SCRIPT_API
+	/// TheSuperHackers @feature Script API: whether the UI would show this button enabled for this object.
+	CommandAvailability getCommandAvailabilityForScriptApi( const CommandButton *command, Object *obj ) const { return getCommandAvailability( command, obj, nullptr ); }
+#endif
 
 	void showPurchaseScience();
 	void hidePurchaseScience();

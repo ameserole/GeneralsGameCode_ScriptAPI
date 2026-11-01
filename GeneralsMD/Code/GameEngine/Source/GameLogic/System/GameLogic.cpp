@@ -71,6 +71,9 @@
 #include "GameClient/GUICallbacks.h"
 #include "GameClient/InGameUI.h"
 #include "GameClient/LoadScreen.h"
+#if RTS_SCRIPT_API
+#include "ScriptApi/ScriptApi.h"
+#endif
 #include "GameClient/MapUtil.h"
 #include "GameClient/Mouse.h"
 #include "GameClient/ParticleSys.h"
@@ -1164,6 +1167,13 @@ void GameLogic::tryStartNewGame( Bool loadingSaveGame )
 #endif
 
 	setLoadingMap( TRUE );
+
+#if RTS_SCRIPT_API
+	// Report loading now: startNewGame runs twice (this first pass only sets m_startNewGame), and the
+	// second pass blocks the game thread until the map is loaded.
+	if (TheScriptApi != nullptr)
+		TheScriptApi->onLoadingStarted();
+#endif
 
 	if( loadingSaveGame == FALSE )
 	{
@@ -4089,6 +4099,12 @@ Object *GameLogic::friend_createObject( const ThingTemplate *thing, const Object
 // ------------------------------------------------------------------------------------------------
 void GameLogic::destroyObject( Object *obj )
 {
+#if RTS_SCRIPT_API
+	// Read-only: lets the script API report the local player's objects that leave without dying (sold).
+	if (TheScriptApi != nullptr && obj != nullptr)
+		TheScriptApi->onObjectRemoved(obj);
+#endif
+
 	DEBUG_ASSERTCRASH(obj != nullptr, ("destroying null object"));
 
 	// if already flagged for destruction, ignore

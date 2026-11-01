@@ -637,6 +637,12 @@ GlobalData::GlobalData()
 	m_framesPerSecondLimit = 0;
 	m_chipSetType = 0;
 	m_headless = FALSE;
+#if RTS_SCRIPT_API
+	m_scriptApiEnabled = FALSE;
+	m_scriptApiPort = 0;
+	m_scriptApiDebug = FALSE;
+	m_scriptApiApm = 0;
+#endif
 	m_windowed = 0;
 	m_xResolution = DEFAULT_DISPLAY_WIDTH;
 	m_yResolution = DEFAULT_DISPLAY_HEIGHT;

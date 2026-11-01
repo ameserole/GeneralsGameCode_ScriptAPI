@@ -124,6 +124,15 @@ public:
 	// Run game without graphics, input or audio.
 	Bool m_headless;
 
+#if RTS_SCRIPT_API
+	// Script API: localhost WebSocket server that lets external scripts play this client's player.
+	Bool m_scriptApiEnabled;
+	Int m_scriptApiPort; ///< 0 selects the default port for this client instance.
+	Bool m_scriptApiDebug; ///< Enables debug-build-only commands that reveal hidden state (tests only).
+	AsciiString m_scriptApiInput; ///< Human input mode: "view" (default), "locked" or "full".
+	Int m_scriptApiApm; ///< Cap on accepted script orders per minute of game time; 0 for none.
+#endif
+
 	Bool m_windowed;
 	Int m_xResolution;
 	Int m_yResolution;

@@ -32,6 +32,9 @@
 #include "Common/Player.h"
 #include "Common/PlayerList.h"
 #include "GameLogic/GameLogic.h"
+#if RTS_SCRIPT_API
+#include "ScriptApi/ScriptApi.h"
+#endif
 
 
 //-------------------------------------------------------------------------------------------------
@@ -454,6 +457,11 @@ void Eva::playMessage(EvaMessage messageToTest, UnsignedInt currentFrame)
 	check.m_alreadyPlayed = FALSE;
 
 	m_checks.push_back(check);
+
+#if RTS_SCRIPT_API
+	if (TheScriptApi != nullptr)
+		TheScriptApi->onEvaMessage(Eva::messageToName(messageToTest).str());
+#endif
 }
 
 //-------------------------------------------------------------------------------------------------

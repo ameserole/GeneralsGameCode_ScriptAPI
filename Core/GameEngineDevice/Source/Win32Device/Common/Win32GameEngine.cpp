@@ -35,6 +35,9 @@
 #include "Common/PerfTimer.h"
 
 #include "GameNetwork/LANAPICallbacks.h"
+#if RTS_SCRIPT_API && RTS_ZEROHOUR
+#include "ScriptApi/ScriptApi.h"
+#endif
 
 extern DWORD TheMessageTime;
 
@@ -111,6 +114,12 @@ void Win32GameEngine::update()
 			if (TheGameEngine->getQuitting() || TheGameLogic->isInInternetGame() || TheGameLogic->isInLanGame()) {
 				break; // keep running.
 			}
+#if RTS_SCRIPT_API && RTS_ZEROHOUR
+			// TheSuperHackers @feature A script-controlled client keeps playing while minimized.
+			if (TheScriptApi != nullptr) {
+				break; // keep running.
+			}
+#endif
 		}
 
     // When we are alt-tabbed out... the MilesAudioManager seems to go into a coma sometimes

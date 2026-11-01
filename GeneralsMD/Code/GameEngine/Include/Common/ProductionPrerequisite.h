@@ -96,6 +96,13 @@ public:
 
 	Int getAllPossibleBuildFacilityTemplates(const ThingTemplate* tmpls[], Int maxtmpls) const;
 
+	// TheSuperHackers @feature Read-only access to the requirements, for the script API catalog.
+	Int getUnitPrereqCount() const { return (Int)m_prereqUnits.size(); }
+	const ThingTemplate *getUnitPrereq(Int i) const { return m_prereqUnits[i].unit; }
+	Bool isUnitPrereqOrWithPrevious(Int i) const { return (m_prereqUnits[i].flags & UNIT_OR_WITH_PREV) != 0; }
+	Int getSciencePrereqCount() const { return (Int)m_prereqSciences.size(); }
+	ScienceType getSciencePrereq(Int i) const { return m_prereqSciences[i]; }
+
 private:
 
 	enum

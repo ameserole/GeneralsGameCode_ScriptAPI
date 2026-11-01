@@ -2812,6 +2812,12 @@ void MemoryPoolFactory::adjustTotals(const char* tagString, Int usedDelta, Int p
 {
 	USE_PERF_TIMER(MemoryPoolDebugging)
 
+	// TheSuperHackers @bugfix Pool allocations call this under TheMemoryPoolCriticalSection, but raw
+	// DMA allocations only hold TheDmaCriticalSection. Take the pool lock here as well, so that
+	// allocations on two threads cannot lose updates of the totals (which trips the "used count
+	// mismatch" check at shutdown). The DMA path already takes these locks in this order.
+	ScopedCriticalSection scopedCriticalSection(TheMemoryPoolCriticalSection);
+
 	m_usedBytes += usedDelta;
 	m_physBytes += physDelta;
 	if (m_peakUsedBytes < m_usedBytes)
