@@ -825,6 +825,44 @@ Int parseNoShaders(char *args[], int)
 	return 1;
 }
 
+#if RTS_SCRIPT_API && RTS_ZEROHOUR
+Int parseScriptApi(char *args[], int)
+{
+	TheWritableGlobalData->m_scriptApiEnabled = TRUE;
+	return 1;
+}
+
+Int parseScriptApiPort(char *args[], int num)
+{
+	if (num > 1)
+	{
+		TheWritableGlobalData->m_scriptApiEnabled = TRUE;
+		TheWritableGlobalData->m_scriptApiPort = atoi(args[1]);
+	}
+	return 2;
+}
+
+Int parseScriptApiDebug(char *args[], int)
+{
+	TheWritableGlobalData->m_scriptApiDebug = TRUE;
+	return 1;
+}
+
+Int parseScriptApiInput(char *args[], int num)
+{
+	if (num > 1)
+		TheWritableGlobalData->m_scriptApiInput = args[1];
+	return 2;
+}
+
+Int parseScriptApiApm(char *args[], int num)
+{
+	if (num > 1)
+		TheWritableGlobalData->m_scriptApiApm = atoi(args[1]);
+	return 2;
+}
+#endif
+
 Int parseNoLogo(char *args[], int)
 {
 	TheWritableGlobalData->m_playIntro = FALSE;
@@ -1022,11 +1060,19 @@ Int parseStats(char *args[], int num)
 #endif
 
 #ifdef DEBUG_CRASHING
+static bool alwaysIgnoreAsserts()
+{
+	return true;
+}
+
 Int parseIgnoreAsserts(char *args[], int num)
 {
 	if (num > 0)
 	{
 		TheWritableGlobalData->m_debugIgnoreAsserts = true;
+		// TheSuperHackers @bugfix The memory leak report at shutdown runs after TheGlobalData is deleted,
+		// where the default query no longer sees this flag and blocks the exit on a crash box.
+		DebugSetIgnoreAssertsQuery(alwaysIgnoreAsserts);
 	}
 	return 1;
 }
@@ -1193,6 +1239,18 @@ static CommandLineParam paramsForStartup[] =
 static CommandLineParam paramsForEngineInit[] =
 {
 	{ "-nologo", parseNoLogo }, // TheSuperHackers @tweak Is now available in Release builds.
+
+#if RTS_SCRIPT_API && RTS_ZEROHOUR
+	// Start the script API WebSocket server on 127.0.0.1. -scriptApiPort also selects the port.
+	{ "-scriptApi", parseScriptApi },
+	{ "-scriptApiPort", parseScriptApiPort },
+	// Debug builds only: allow script API commands that reveal hidden state. For tests.
+	{ "-scriptApiDebug", parseScriptApiDebug },
+	// What a human may do in the window of a script-controlled client: view (camera only), locked or full.
+	{ "-scriptApiInput", parseScriptApiInput },
+	// Cap on the script's accepted orders per minute of game time (0, the default, for none).
+	{ "-scriptApiApm", parseScriptApiApm },
+#endif
 	{ "-noshellmap", parseNoShellMap },
 	{ "-noShellAnim", parseNoWindowAnimation }, // TheSuperHackers @tweak Is now available in Release builds.
 	{ "-xres", parseXRes },

@@ -10,6 +10,7 @@ option(RTS_BUILD_OPTION_ASAN "Build code with Address Sanitizer." OFF)
 option(RTS_BUILD_OPTION_VC6_FULL_DEBUG "Build VC6 with full debug info." OFF)
 cmake_dependent_option(RTS_BUILD_OPTION_TESTS "Build the unit tests." OFF "NOT IS_VS6_BUILD" OFF)
 cmake_dependent_option(RTS_BUILD_OPTION_BENCHMARKS "Build the benchmarks." OFF "NOT IS_VS6_BUILD" OFF)
+cmake_dependent_option(RTS_BUILD_OPTION_SCRIPT_API "Build the Zero Hour script API (WebSocket server for external scripts)." OFF "NOT IS_VS6_BUILD" OFF)
 
 if(NOT RTS_BUILD_ZEROHOUR AND NOT RTS_BUILD_GENERALS)
     set(RTS_BUILD_ZEROHOUR TRUE)
@@ -27,6 +28,7 @@ add_feature_info(Vc6FullDebug RTS_BUILD_OPTION_VC6_FULL_DEBUG "Building VC6 with
 add_feature_info(FFmpegSupport RTS_BUILD_OPTION_FFMPEG "Building with FFmpeg support")
 add_feature_info(Tests RTS_BUILD_OPTION_TESTS "Building the unit tests")
 add_feature_info(Benchmarks RTS_BUILD_OPTION_BENCHMARKS "Building the benchmarks")
+add_feature_info(ScriptApi RTS_BUILD_OPTION_SCRIPT_API "Building the script API")
 
 set(RTS_BUILD_OUTPUT_SUFFIX "" CACHE STRING "Suffix appended to output names of installable targets")
 
@@ -80,4 +82,9 @@ endif()
 
 if(RTS_BUILD_OPTION_PROFILE)
     target_compile_definitions(core_config INTERFACE RTS_PROFILE_LEGACY)
+endif()
+
+# Defined for every game target so that headers with script API members (GlobalData) have one layout.
+if(RTS_BUILD_OPTION_SCRIPT_API)
+    target_compile_definitions(core_config INTERFACE RTS_SCRIPT_API=1)
 endif()

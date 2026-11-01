@@ -16,3 +16,7 @@ add_subdirectory(Source/MiniDumper)
 add_subdirectory(Source/EABrowserDispatch)
 add_subdirectory(Source/EABrowserEngine)
 add_subdirectory(Source/Compression)
+
+if(RTS_BUILD_OPTION_SCRIPT_API)
+    add_subdirectory(Source/ScriptApi)
+endif()

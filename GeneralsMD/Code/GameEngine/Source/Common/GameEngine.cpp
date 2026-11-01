@@ -86,6 +86,9 @@
 #include "GameLogic/SidesList.h"
 
 #include "GameClient/ClientInstance.h"
+#if RTS_SCRIPT_API
+#include "ScriptApi/ScriptApi.h"
+#endif
 #include "GameClient/FXList.h"
 #include "GameClient/GameClient.h"
 #include "GameClient/Keyboard.h"
@@ -104,6 +107,7 @@
 #include "GameNetwork/NetworkInterface.h"
 #include "GameNetwork/WOLBrowser/WebBrowser.h"
 #include "GameNetwork/LANAPI.h"
+#include "GameNetwork/LANAPICallbacks.h"
 #include "GameNetwork/GameSpy/GameResultsThread.h"
 
 #include "Common/version.h"
@@ -274,6 +278,12 @@ GameEngine::~GameEngine()
 	TheSubsystemList->shutdownAll();
 	delete TheSubsystemList;
 	TheSubsystemList = nullptr;
+
+	// TheSuperHackers @bugfix Free the LAN lobby state when quitting to the desktop from a LAN lobby or a
+	// LAN match. Only the lobby's Back button deleted it, so every other exit leaked it and its transport.
+	// This must follow the shell's shutdown, because the LAN menus' shutdown callbacks still use it.
+	delete TheLAN;
+	TheLAN = nullptr;
 
 	delete TheSkirmishGameInfo;
 	TheSkirmishGameInfo = nullptr;
@@ -635,6 +645,12 @@ void GameEngine::init()
 		// Create the interface for sending game results
 		initSubsystem(TheGameResultsQueue,"TheGameResultsQueue", GameResultsInterface::createNewGameResultsInterface(), nullptr);
 
+#if RTS_SCRIPT_API
+		// Created last so it is shut down first, while everything it reads still exists.
+		if (TheGlobalData->m_scriptApiEnabled)
+			initSubsystem(TheScriptApi,"TheScriptApi", MSGNEW("GameEngineSubsystem") ScriptApi, nullptr);
+#endif
+
 
 	#ifdef DUMP_PERF_STATS///////////////////////////////////////////////////////////////////////////
 	GetPrecisionTimer(&endTime64);//////////////////////////////////////////////////////////////////
@@ -889,6 +905,13 @@ void GameEngine::update()
 
 			TheAudio->UPDATE();
 			TheGameClient->UPDATE();
+
+#if RTS_SCRIPT_API
+			// Script requests enter the message stream here, just like local player input.
+			if (TheScriptApi != nullptr)
+				TheScriptApi->UPDATE();
+#endif
+
 			TheMessageStream->propagateMessages();
 
 			if (TheNetwork != nullptr)

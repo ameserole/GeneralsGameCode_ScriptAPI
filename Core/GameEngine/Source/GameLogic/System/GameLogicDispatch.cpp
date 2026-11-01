@@ -84,6 +84,9 @@
 #include "GameClient/LookAtXlat.h"
 
 #include "GameNetwork/NetworkInterface.h"
+#if RTS_SCRIPT_API && RTS_ZEROHOUR
+#include "ScriptApi/ScriptApi.h"
+#endif
 
 
 
@@ -368,6 +371,12 @@ void GameLogic::logicMessageDispatcher( GameMessage *msg, void *userData )
 	}
 
 	AIGroupPtr currentlySelectedGroup = nullptr;
+
+#if RTS_SCRIPT_API && RTS_ZEROHOUR
+	// Read-only: lets the script API report when the local player's orders are carried out.
+	if (TheScriptApi != nullptr)
+		TheScriptApi->onCommandExecuted(msg->getType(), msgPlayer);
+#endif
 
 	if (isInGame())
 	{

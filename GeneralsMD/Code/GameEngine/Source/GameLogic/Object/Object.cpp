@@ -114,6 +114,9 @@
 #include "Common/MiscAudio.h"
 #include "Common/AudioEventInfo.h"
 #include "Common/DynamicAudioEventInfo.h"
+#if RTS_SCRIPT_API
+#include "ScriptApi/ScriptApi.h"
+#endif
 
 
 #ifdef DEBUG_OBJECT_ID_EXISTS
@@ -4730,6 +4733,11 @@ void Object::onDie( DamageInfo *damageInfo )
 #endif
 
 	Bool selfInflicted = (damageInfo->in.m_sourceID == getID());
+
+#if RTS_SCRIPT_API
+	if (TheScriptApi != nullptr)
+		TheScriptApi->onObjectDied(this, damageInfo);
+#endif
 
 	// FIRST, call our die modules.
 	for (BehaviorModule** d = m_behaviors; *d; ++d)

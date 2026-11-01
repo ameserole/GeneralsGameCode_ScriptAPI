@@ -79,6 +79,11 @@ else()
     add_library(core_profile_tracy INTERFACE)
 endif()
 
+if(RTS_BUILD_OPTION_SCRIPT_API)
+    include(cmake/nlohmann_json.cmake)
+    include(cmake/ixwebsocket.cmake)
+endif()
+
 if(RTS_BUILD_OPTION_TESTS)
     # Must come before the subdirectories that add tests.
     enable_testing()

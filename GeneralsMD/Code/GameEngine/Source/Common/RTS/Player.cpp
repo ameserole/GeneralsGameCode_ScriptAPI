@@ -100,6 +100,9 @@
 #include "GameLogic/VictoryConditions.h"
 
 #include "GameNetwork/GameInfo.h"
+#if RTS_SCRIPT_API
+#include "ScriptApi/ScriptApi.h"
+#endif
 
 
 //Grey for neutral.
@@ -1549,6 +1552,11 @@ void Player::repairStructure(ObjectID structureID)
 //-------------------------------------------------------------------------------------------------
 void Player::onUnitCreated( Object *factory, Object *unit )
 {
+#if RTS_SCRIPT_API
+	if (TheScriptApi != nullptr)
+		TheScriptApi->onUnitCreated(this, factory, unit);
+#endif
+
 	// When a a unit is completed, it becomes "real" as far as scripting is
 	// concerned. jba.
 	TheScriptEngine->notifyOfObjectCreationOrDestruction();
@@ -1623,7 +1631,10 @@ void Player::preTeamDestroy( const Team *team )
 //-------------------------------------------------------------------------------------------------
 void Player::onStructureCreated( Object *builder, Object *structure )
 {
-
+#if RTS_SCRIPT_API
+	if (TheScriptApi != nullptr)
+		TheScriptApi->onStructureCreated(this, builder, structure);
+#endif
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -1631,6 +1642,11 @@ void Player::onStructureCreated( Object *builder, Object *structure )
 //-------------------------------------------------------------------------------------------------
 void Player::onStructureConstructionComplete( Object *builder, Object *structure, Bool isRebuild )
 {
+#if RTS_SCRIPT_API
+	if (TheScriptApi != nullptr)
+		TheScriptApi->onStructureConstructionComplete(this, builder, structure, isRebuild);
+#endif
+
 	// When a a structure is completed, it becomes "real" as far as scripting is
 	// concerned. jba.
 	TheScriptEngine->notifyOfObjectCreationOrDestruction();
@@ -2572,6 +2588,11 @@ Bool Player::addScience(ScienceType science)
 
 	m_sciences.push_back(science);
 
+#if RTS_SCRIPT_API
+	if (TheScriptApi != nullptr)
+		TheScriptApi->onScienceAdded(this, science);
+#endif
+
 	// 'wake up' any special powers controlled by, well, stuff
 	for (PlayerTeamList::iterator it = m_playerTeamPrototypes.begin();
 			 it != m_playerTeamPrototypes.end(); ++it)
@@ -3116,6 +3137,11 @@ Upgrade *Player::addUpgrade( const UpgradeTemplate *upgradeTemplate, UpgradeStat
 */
 void Player::onUpgradeCompleted( const UpgradeTemplate *upgradeTemplate )
 {
+#if RTS_SCRIPT_API
+	if (TheScriptApi != nullptr)
+		TheScriptApi->onUpgradeCompleted(this, upgradeTemplate);
+#endif
+
 	for (PlayerTeamList::iterator it = m_playerTeamPrototypes.begin();
 			 it != m_playerTeamPrototypes.end(); ++it)
 	{

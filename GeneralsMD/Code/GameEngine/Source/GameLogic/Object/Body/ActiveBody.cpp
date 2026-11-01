@@ -59,6 +59,9 @@
 #include "GameLogic/Module/ContainModule.h"
 #include "GameLogic/Module/DamageModule.h"
 #include "GameLogic/Module/DieModule.h"
+#if RTS_SCRIPT_API
+#include "ScriptApi/ScriptApi.h"
+#endif
 
 
 
@@ -613,6 +616,12 @@ void ActiveBody::attemptDamage( DamageInfo *damageInfo )
 		// if our health has gone down then do run the damage module callback
 		if( m_currentHealth < m_prevHealth )
 		{
+#if RTS_SCRIPT_API
+			// Read-only: lets the script API report damage to the local player's objects.
+			if (TheScriptApi != nullptr)
+				TheScriptApi->onObjectDamaged(obj, damageInfo);
+#endif
+
 			for (BehaviorModule** m = obj->getBehaviorModules(); *m; ++m)
 			{
 				DamageModuleInterface* d = (*m)->getDamage();

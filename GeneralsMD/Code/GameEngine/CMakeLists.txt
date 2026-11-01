@@ -1156,3 +1156,21 @@ target_link_libraries(z_gameengine PUBLIC
 target_precompile_headers(z_gameengine PRIVATE
     [["Precompiled/BasePrecomp.h"]] # Must be first
 )
+
+if(RTS_BUILD_OPTION_SCRIPT_API)
+    target_sources(z_gameengine PRIVATE
+        Include/ScriptApi/ScriptApi.h
+        Source/ScriptApi/ScriptApi.cpp
+        Source/ScriptApi/ScriptApiSkirmish.cpp
+        Source/ScriptApi/ScriptApiWorldView.cpp
+        Source/ScriptApi/ScriptApiActions.cpp
+        Source/ScriptApi/ScriptApiAbilities.cpp
+        Source/ScriptApi/ScriptApiOrderHelpers.h
+        Source/ScriptApi/ScriptApiInput.cpp
+        Source/ScriptApi/ScriptApiLanLobby.cpp
+        Source/ScriptApi/ScriptApiShellHelpers.h
+    )
+    target_link_libraries(z_gameengine PUBLIC
+        core_scriptapi
+    )
+endif()
